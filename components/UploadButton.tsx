@@ -5,24 +5,43 @@ import * as FileSystem from 'expo-file-system';
 import { toByteArray } from 'base64-js';
 import AWS from 'aws-sdk';
 import awsConfig from '../aws-config.json';
-
-const credentials = new AWS.Credentials({
-  accessKeyId: awsConfig.accessKeyId,
-  secretAccessKey: awsConfig.secretAccessKey,
-});
-
-AWS.config.update({
-  credentials: credentials,
-  region: awsConfig.region,
-});
-
-const s3 = new AWS.S3();
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UploadButton = () => {
   const handleUpload = async () => {
     try {
+      const accessKey = await AsyncStorage.getItem('AWS_ACCESS_KEY');
+      const secretAccessKey = await AsyncStorage.getItem('AWS_SECRET_ACCESS_KEY');
+      const region = await AsyncStorage.getItem('AWS_REGION');
+
+      if (!accessKey || !secretAccessKey || !region) {
+        Alert.alert(
+          'Credentials Missing',
+          'Please save your AWS credentials in the settings screen before uploading images.',
+          [{ text: 'OK' }],
+          { cancelable: false }
+        );
+        return;
+      }
+
+      const credentials = new AWS.Credentials({
+        accessKeyId: accessKey,
+        secretAccessKey: secretAccessKey,
+      });
+
+      AWS.config.update({
+        credentials: credentials,
+        region: region,
+      });
+
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
+        Alert.alert(
+          'Permission Denied',
+          'You need to grant permission to access the media library in order to upload images.',
+          [{ text: 'OK' }],
+          { cancelable: false }
+        );
         console.log('Permission denied');
         return;
       }
@@ -55,6 +74,8 @@ const UploadButton = () => {
             Body: uint8Array,
             ContentType: 'image/jpeg',
           };
+
+          const s3 = new AWS.S3();
 
           return s3.upload(params).promise();
         });
