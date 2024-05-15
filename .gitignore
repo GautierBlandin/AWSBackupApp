@@ -19,3 +19,6 @@ aws-config.json
 
 expo-env.d.ts
 # @end expo-cli
+
+# Webstorm
+.idea/
