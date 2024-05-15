@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-native';
+import { Button, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { toByteArray } from 'base64-js';
@@ -61,9 +61,23 @@ const UploadButton = () => {
 
         await Promise.all(uploadPromises);
         console.log('Images uploaded successfully');
+
+        Alert.alert(
+          'Upload Successful',
+          'The selected images have been uploaded successfully.',
+          [{ text: 'OK' }],
+          { cancelable: false }
+        );
       }
     } catch (error) {
       console.error('Error uploading images:', error);
+
+      Alert.alert(
+        'Upload Error',
+        'An error occurred while uploading the images. Please try again.',
+        [{ text: 'OK' }],
+        { cancelable: false }
+      );
     }
   };
 
