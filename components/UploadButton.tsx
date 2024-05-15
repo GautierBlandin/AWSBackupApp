@@ -28,43 +28,46 @@ const UploadButton = () => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
+        allowsMultipleSelection: true,
       });
 
       if (!result.canceled) {
-        const asset = result.assets[0];
+        const uploadPromises = result.assets.map(async (asset) => {
+          const fileUri = asset.uri;
+          const fileInfo = await FileSystem.getInfoAsync(fileUri);
 
-        const fileUri = asset.uri;
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
+          if (!fileInfo.exists) {
+            console.log('File does not exist');
+            return;
+          }
 
-        if (!fileInfo.exists) {
-          console.log('File does not exist');
-          return;
-        }
+          const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
 
-        const fileContent = await FileSystem.readAsStringAsync(fileUri, {
-          encoding: FileSystem.EncodingType.Base64,
+          const uint8Array = toByteArray(fileContent);
+
+          const params = {
+            Bucket: awsConfig.bucketName,
+            Key: asset.fileName || 'image.jpg',
+            Body: uint8Array,
+            ContentType: 'image/jpeg',
+          };
+
+          return s3.upload(params).promise();
         });
 
-        const uint8Array = toByteArray(fileContent);
-
-        const params = {
-          Bucket: awsConfig.bucketName,
-          Key: asset.fileName || 'image.jpg',
-          Body: uint8Array,
-          ContentType: asset.mimeType,
-        };
-
-        await s3.upload(params).promise();
-        console.log('Image uploaded successfully');
+        await Promise.all(uploadPromises);
+        console.log('Images uploaded successfully');
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error uploading images:', error);
     }
   };
 
-  return <Button title="Upload Image" onPress={handleUpload} />;
+  return <Button title="Upload Images" onPress={handleUpload} />;
 };
 
 export default UploadButton;
