@@ -5,7 +5,8 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "@ab/di-container": ["./lib/di-container/index"]
     }
   },
   "include": [
