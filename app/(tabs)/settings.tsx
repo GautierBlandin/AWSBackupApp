@@ -1,32 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
-import { inject } from '@ab/di-container';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Settings() {
   const [accessKey, setAccessKey] = useState('');
   const [secretAccessKey, setSecretAccessKey] = useState('');
   const [region, setRegion] = useState('');
 
-  const credentialsRepository = inject(credentialsRepositoryToken);
-
   useEffect(() => {
     const fetchCredentials = async () => {
-      const existingAccessKey = await credentialsRepository.getAWSAccessKeyId();
-      const existingSecretAccessKey = await credentialsRepository.getAWSSecretAccessKey();
-      const existingRegion = await credentialsRepository.getAWSRegion();
+      const existingAccessKey = await AsyncStorage.getItem('AWS_ACCESS_KEY');
+      const existingSecretAccessKey = await AsyncStorage.getItem('AWS_SECRET_ACCESS_KEY');
+      const existingRegion = await AsyncStorage.getItem('AWS_REGION');
 
       setAccessKey(existingAccessKey || '');
       setSecretAccessKey(existingSecretAccessKey || '');
       setRegion(existingRegion || '');
     };
     fetchCredentials();
-  }, [credentialsRepository]);
-
+  }, []);
+  // some really long comment that should be wrapped to 140 characters or less. more comment here. more comment yet. now overflowingaaaaaaaaaaaaaaaaaaaa
   const handleSaveCredentials = async () => {
-    await credentialsRepository.setAWSAccessKeyId(accessKey);
-    await credentialsRepository.setAWSSecretAccessKey(secretAccessKey);
-    await credentialsRepository.setAWSRegion(region);
+    await AsyncStorage.setItem('AWS_ACCESS_KEY', accessKey);
+    await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', secretAccessKey);
+    await AsyncStorage.setItem('AWS_REGION', region);
   };
 
   return (
