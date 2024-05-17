@@ -19,7 +19,7 @@ function Settings() {
     };
     fetchCredentials();
   }, []);
-  // some really long comment that should be wrapped to 140 characters or less. more comment here. more comment yet. now overflowingaaaaaaaaaaaaaaaaaaaa
+
   const handleSaveCredentials = async () => {
     await AsyncStorage.setItem('AWS_ACCESS_KEY', accessKey);
     await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', secretAccessKey);
