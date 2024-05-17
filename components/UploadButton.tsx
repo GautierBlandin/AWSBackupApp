@@ -4,15 +4,18 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { toByteArray } from 'base64-js';
 import AWS from 'aws-sdk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { inject } from '@ab/di-container';
+import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
 import awsConfig from '../aws-config.json';
 
 function UploadButton() {
+  const credentialsRepository = inject(credentialsRepositoryToken);
+
   const handleUpload = async () => {
     try {
-      const accessKey = await AsyncStorage.getItem('AWS_ACCESS_KEY');
-      const secretAccessKey = await AsyncStorage.getItem('AWS_SECRET_ACCESS_KEY');
-      const region = await AsyncStorage.getItem('AWS_REGION');
+      const accessKey = await credentialsRepository.getAWSAccessKeyId();
+      const secretAccessKey = await credentialsRepository.getAWSSecretAccessKey();
+      const region = await credentialsRepository.getAWSRegion();
 
       if (!accessKey || !secretAccessKey || !region) {
         Alert.alert(

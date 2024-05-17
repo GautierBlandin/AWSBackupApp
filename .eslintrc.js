@@ -17,7 +17,9 @@ module.exports = {
     "import/extensions": "off",
     "react/react-in-jsx-scope": "off",
     "no-underscore-dangle": "off",
-    "max-len": [2, { "code": 140 }]
+    "max-len": [2, { "code": 140 }],
+    "max-classes-per-file": "off",
+    "class-methods-use-this": "off"
   },
   "overrides": [
     {
