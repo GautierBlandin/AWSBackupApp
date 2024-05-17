@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import UploadButton from '../../components/UploadButton';
 import { useNavigation } from 'expo-router';
+import UploadButton from '../../components/UploadButton';
 
-const App = () => {
+function App() {
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -15,6 +15,6 @@ const App = () => {
       <UploadButton />
     </View>
   );
-};
+}
 
 export default App;

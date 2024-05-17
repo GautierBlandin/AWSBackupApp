@@ -4,10 +4,10 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { toByteArray } from 'base64-js';
 import AWS from 'aws-sdk';
-import awsConfig from '../aws-config.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import awsConfig from '../aws-config.json';
 
-const UploadButton = () => {
+function UploadButton() {
   const handleUpload = async () => {
     try {
       const accessKey = await AsyncStorage.getItem('AWS_ACCESS_KEY');
@@ -19,19 +19,19 @@ const UploadButton = () => {
           'Credentials Missing',
           'Please save your AWS credentials in the settings screen before uploading images.',
           [{ text: 'OK' }],
-          { cancelable: false }
+          { cancelable: false },
         );
         return;
       }
 
       const credentials = new AWS.Credentials({
         accessKeyId: accessKey,
-        secretAccessKey: secretAccessKey,
+        secretAccessKey,
       });
 
       AWS.config.update({
-        credentials: credentials,
-        region: region,
+        credentials,
+        region,
       });
 
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -40,7 +40,7 @@ const UploadButton = () => {
           'Permission Denied',
           'You need to grant permission to access the media library in order to upload images.',
           [{ text: 'OK' }],
-          { cancelable: false }
+          { cancelable: false },
         );
         console.log('Permission denied');
         return;
@@ -87,7 +87,7 @@ const UploadButton = () => {
           'Upload Successful',
           'The selected images have been uploaded successfully.',
           [{ text: 'OK' }],
-          { cancelable: false }
+          { cancelable: false },
         );
       }
     } catch (error) {
@@ -97,12 +97,12 @@ const UploadButton = () => {
         'Upload Error',
         'An error occurred while uploading the images. Please try again.',
         [{ text: 'OK' }],
-        { cancelable: false }
+        { cancelable: false },
       );
     }
   };
 
   return <Button title="Upload Images" onPress={handleUpload} />;
-};
+}
 
 export default UploadButton;
