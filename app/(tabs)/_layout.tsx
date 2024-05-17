@@ -9,6 +9,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Upload',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="upload" color={color} />,
         }}
       />
@@ -16,6 +17,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
         }}
       />

@@ -26,7 +26,8 @@ module.exports = {
         "@typescript-eslint/no-use-before-define": "off"
       }
     }
-  ]
+  ],
+  ignorePatterns: [".eslintrc.js", "scripts/reset-project.js", "babel.config.js"]
 }
 
 

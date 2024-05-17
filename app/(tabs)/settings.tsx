@@ -21,13 +21,9 @@ function Settings() {
   }, []);
 
   const handleSaveCredentials = async () => {
-    try {
-      await AsyncStorage.setItem('AWS_ACCESS_KEY', accessKey);
-      await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', secretAccessKey);
-      await AsyncStorage.setItem('AWS_REGION', region);
-    } catch (error) {
-      console.error('Error saving credentials:', error);
-    }
+    await AsyncStorage.setItem('AWS_ACCESS_KEY', accessKey);
+    await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', secretAccessKey);
+    await AsyncStorage.setItem('AWS_REGION', region);
   };
 
   return (

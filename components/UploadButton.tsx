@@ -42,7 +42,6 @@ function UploadButton() {
           [{ text: 'OK' }],
           { cancelable: false },
         );
-        console.log('Permission denied');
         return;
       }
 
@@ -58,8 +57,7 @@ function UploadButton() {
           const fileInfo = await FileSystem.getInfoAsync(fileUri);
 
           if (!fileInfo.exists) {
-            console.log('File does not exist');
-            return;
+            return undefined;
           }
 
           const fileContent = await FileSystem.readAsStringAsync(fileUri, {
@@ -81,7 +79,6 @@ function UploadButton() {
         });
 
         await Promise.all(uploadPromises);
-        console.log('Images uploaded successfully');
 
         Alert.alert(
           'Upload Successful',
@@ -91,8 +88,6 @@ function UploadButton() {
         );
       }
     } catch (error) {
-      console.error('Error uploading images:', error);
-
       Alert.alert(
         'Upload Error',
         'An error occurred while uploading the images. Please try again.',
