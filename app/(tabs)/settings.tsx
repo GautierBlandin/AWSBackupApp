@@ -1,29 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { inject } from '@ab/di-container';
+import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
 
 function Settings() {
   const [accessKey, setAccessKey] = useState('');
   const [secretAccessKey, setSecretAccessKey] = useState('');
   const [region, setRegion] = useState('');
 
+  const credentialsRepository = inject(credentialsRepositoryToken);
+
   useEffect(() => {
     const fetchCredentials = async () => {
-      const existingAccessKey = await AsyncStorage.getItem('AWS_ACCESS_KEY');
-      const existingSecretAccessKey = await AsyncStorage.getItem('AWS_SECRET_ACCESS_KEY');
-      const existingRegion = await AsyncStorage.getItem('AWS_REGION');
+      const existingAccessKey = await credentialsRepository.getAWSAccessKeyId();
+      const existingSecretAccessKey = await credentialsRepository.getAWSSecretAccessKey();
+      const existingRegion = await credentialsRepository.getAWSRegion();
 
       setAccessKey(existingAccessKey || '');
       setSecretAccessKey(existingSecretAccessKey || '');
       setRegion(existingRegion || '');
     };
     fetchCredentials();
-  }, []);
+  }, [credentialsRepository]);
 
   const handleSaveCredentials = async () => {
-    await AsyncStorage.setItem('AWS_ACCESS_KEY', accessKey);
-    await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', secretAccessKey);
-    await AsyncStorage.setItem('AWS_REGION', region);
+    await credentialsRepository.setAWSAccessKeyId(accessKey);
+    await credentialsRepository.setAWSSecretAccessKey(secretAccessKey);
+    await credentialsRepository.setAWSRegion(region);
   };
 
   return (
