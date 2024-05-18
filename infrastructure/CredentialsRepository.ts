@@ -29,6 +29,15 @@ export class AsyncStorageCredentialsRepository implements CredentialsRepository 
     return this.nullToUndefined(value);
   }
 
+  public async setBucketName(bucketName: string): Promise<void> {
+    await AsyncStorage.setItem('BUCKET_NAME', bucketName);
+  }
+
+  public async getBucketName(): Promise<string | undefined> {
+    const value = await AsyncStorage.getItem('BUCKET_NAME');
+    return this.nullToUndefined(value);
+  }
+
   private nullToUndefined(value: string | null): string | undefined {
     if (value === null) {
       return undefined;
