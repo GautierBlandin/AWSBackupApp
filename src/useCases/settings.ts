@@ -50,6 +50,13 @@ export class SettingsUseCase {
     region,
     bucketName,
   }: Credentials) {
+    this.credentials = {
+      accessKey,
+      secretAccessKey,
+      region,
+      bucketName,
+    };
+
     const promises = [
       this.credentialsRepository.setAWSAccessKeyId(accessKey),
       this.credentialsRepository.setAWSSecretAccessKey(secretAccessKey),
