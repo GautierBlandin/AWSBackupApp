@@ -5,4 +5,6 @@ export interface CredentialsRepository {
   getAWSSecretAccessKey(): Promise<string | undefined>;
   setAWSRegion(awsRegion: string): Promise<void>;
   getAWSRegion(): Promise<string | undefined>;
+  setBucketName(bucketName: string): Promise<void>;
+  getBucketName(): Promise<string | undefined>;
 }

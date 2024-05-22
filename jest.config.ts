@@ -9,7 +9,7 @@ const config: Config.InitialOptions = {
     '/node_modules/',
   ],
   moduleNameMapper: {
-    '^@ab/di-container$': '<rootDir>/lib/di-container/index',
+    '^@ab/di-container$': '<rootDir>/src/lib/di-container/index',
   },
 };
 

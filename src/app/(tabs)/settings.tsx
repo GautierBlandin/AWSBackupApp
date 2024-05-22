@@ -7,6 +7,7 @@ function Settings() {
   const [accessKey, setAccessKey] = useState('');
   const [secretAccessKey, setSecretAccessKey] = useState('');
   const [region, setRegion] = useState('');
+  const [bucketName, setBucketName] = useState('');
 
   const credentialsRepository = inject(credentialsRepositoryToken);
 
@@ -15,10 +16,12 @@ function Settings() {
       const existingAccessKey = await credentialsRepository.getAWSAccessKeyId();
       const existingSecretAccessKey = await credentialsRepository.getAWSSecretAccessKey();
       const existingRegion = await credentialsRepository.getAWSRegion();
+      const existingBucketName = await credentialsRepository.getBucketName();
 
       setAccessKey(existingAccessKey || '');
       setSecretAccessKey(existingSecretAccessKey || '');
       setRegion(existingRegion || '');
+      setBucketName(existingBucketName || '');
     };
     fetchCredentials();
   }, [credentialsRepository]);
@@ -27,6 +30,7 @@ function Settings() {
     await credentialsRepository.setAWSAccessKeyId(accessKey);
     await credentialsRepository.setAWSSecretAccessKey(secretAccessKey);
     await credentialsRepository.setAWSRegion(region);
+    await credentialsRepository.setBucketName(bucketName);
   };
 
   return (
@@ -46,6 +50,11 @@ function Settings() {
         placeholder="Region"
         value={region}
         onChangeText={setRegion}
+      />
+      <TextInput
+        placeholder="Bucket Name"
+        value={bucketName}
+        onChangeText={setBucketName}
       />
       <Button title="Save Credentials" onPress={handleSaveCredentials} />
     </View>
