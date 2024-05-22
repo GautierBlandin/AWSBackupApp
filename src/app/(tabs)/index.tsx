@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Alert, Button, View } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
@@ -7,7 +7,7 @@ import { DisplayableError } from '@/errors/DisplayableError';
 function App() {
   const navigation = useNavigation();
 
-  const uploadUseCase = new UploadUseCase();
+  const uploadUseCase = useMemo(() => new UploadUseCase(), []);
 
   const handleUpload = async () => {
     try {

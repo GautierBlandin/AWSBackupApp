@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
-import { inject } from '@ab/di-container';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import { SettingsUseCase } from '@/useCases/settings';
 
 function Settings() {
   const [accessKey, setAccessKey] = useState('');
@@ -9,28 +8,26 @@ function Settings() {
   const [region, setRegion] = useState('');
   const [bucketName, setBucketName] = useState('');
 
-  const credentialsRepository = inject(credentialsRepositoryToken);
+  const settingsUseCase = useMemo(() => new SettingsUseCase(), []);
 
   useEffect(() => {
     const fetchCredentials = async () => {
-      const existingAccessKey = await credentialsRepository.getAWSAccessKeyId();
-      const existingSecretAccessKey = await credentialsRepository.getAWSSecretAccessKey();
-      const existingRegion = await credentialsRepository.getAWSRegion();
-      const existingBucketName = await credentialsRepository.getBucketName();
-
-      setAccessKey(existingAccessKey || '');
-      setSecretAccessKey(existingSecretAccessKey || '');
-      setRegion(existingRegion || '');
-      setBucketName(existingBucketName || '');
+      const credentials = await settingsUseCase.loadCredentials();
+      setAccessKey(credentials.accessKey || '');
+      setSecretAccessKey(credentials.secretAccessKey || '');
+      setRegion(credentials.region || '');
+      setBucketName(credentials.bucketName || '');
     };
     fetchCredentials();
-  }, [credentialsRepository]);
+  }, [settingsUseCase]);
 
   const handleSaveCredentials = async () => {
-    await credentialsRepository.setAWSAccessKeyId(accessKey);
-    await credentialsRepository.setAWSSecretAccessKey(secretAccessKey);
-    await credentialsRepository.setAWSRegion(region);
-    await credentialsRepository.setBucketName(bucketName);
+    await settingsUseCase.saveCredentials({
+      accessKey,
+      secretAccessKey,
+      region,
+      bucketName,
+    });
   };
 
   return (

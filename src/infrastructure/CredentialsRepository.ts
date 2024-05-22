@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsRepository } from '@/ports/CredentialsRepository';
 
 export class AsyncStorageCredentialsRepository implements CredentialsRepository {
-  public async setAWSAccessKeyId(awsAccessKeyId: string): Promise<void> {
-    await AsyncStorage.setItem('AWS_ACCESS_KEY', awsAccessKeyId);
+  public async setAWSAccessKeyId(awsAccessKeyId: string | undefined): Promise<void> {
+    await AsyncStorage.setItem('AWS_ACCESS_KEY', awsAccessKeyId || '');
   }
 
   public async getAWSAccessKeyId(): Promise<string | undefined> {
@@ -11,8 +11,8 @@ export class AsyncStorageCredentialsRepository implements CredentialsRepository 
     return this.nullToUndefined(value);
   }
 
-  public async setAWSSecretAccessKey(awsSecretAccessKey: string): Promise<void> {
-    await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', awsSecretAccessKey);
+  public async setAWSSecretAccessKey(awsSecretAccessKey: string | undefined): Promise<void> {
+    await AsyncStorage.setItem('AWS_SECRET_ACCESS_KEY', awsSecretAccessKey || '');
   }
 
   public async getAWSSecretAccessKey(): Promise<string | undefined> {
@@ -20,8 +20,8 @@ export class AsyncStorageCredentialsRepository implements CredentialsRepository 
     return this.nullToUndefined(value);
   }
 
-  public async setAWSRegion(awsRegion: string): Promise<void> {
-    await AsyncStorage.setItem('AWS_REGION', awsRegion);
+  public async setAWSRegion(awsRegion: string | undefined): Promise<void> {
+    await AsyncStorage.setItem('AWS_REGION', awsRegion || '');
   }
 
   public async getAWSRegion(): Promise<string | undefined> {
@@ -29,8 +29,8 @@ export class AsyncStorageCredentialsRepository implements CredentialsRepository 
     return this.nullToUndefined(value);
   }
 
-  public async setBucketName(bucketName: string): Promise<void> {
-    await AsyncStorage.setItem('BUCKET_NAME', bucketName);
+  public async setBucketName(bucketName: string | undefined): Promise<void> {
+    await AsyncStorage.setItem('BUCKET_NAME', bucketName || '');
   }
 
   public async getBucketName(): Promise<string | undefined> {
