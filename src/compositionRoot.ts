@@ -8,9 +8,17 @@ import { ExpoImagePicker } from '@/infrastructure/ExpoImagePicker';
 import { AsyncStorageCredentialsRepository } from '@/infrastructure/AsyncStorageCredentialsRepository';
 import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
 
+const infrastructureRegistered = {
+  loaded: false,
+};
+
 export function registerInfrastructure() {
-  register(fileSystemToken, { useClass: ExpoFileSystem });
-  register(storageAdapterToken, { useClass: S3StorageAdapter });
-  register(imagePickerToken, { useClass: ExpoImagePicker });
-  register(credentialsRepositoryToken, { useClass: AsyncStorageCredentialsRepository });
+  if (!infrastructureRegistered.loaded) {
+    register(fileSystemToken, { useClass: ExpoFileSystem });
+    register(storageAdapterToken, { useClass: S3StorageAdapter });
+    register(imagePickerToken, { useClass: ExpoImagePicker });
+    register(credentialsRepositoryToken, { useClass: AsyncStorageCredentialsRepository });
+  }
+
+  infrastructureRegistered.loaded = true;
 }
