@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
-import { Alert, Button, View } from 'react-native';
+import { Button, View } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
 import { DisplayableError } from '@/errors/DisplayableError';
+import crossPlatformAlert from '@/components/CrossPlatformAlert';
 
 function App() {
   const navigation = useNavigation();
@@ -14,7 +15,7 @@ function App() {
       const result = await uploadUseCase.handleUpload();
 
       if (result.status === 'success') {
-        Alert.alert(
+        crossPlatformAlert(
           'Upload Successful',
           'The selected images have been uploaded successfully.',
           [{ text: 'OK' }],
@@ -23,7 +24,7 @@ function App() {
       }
     } catch (error) {
       if (error instanceof DisplayableError) {
-        Alert.alert(
+        crossPlatformAlert(
           error.title,
           error.message,
           [{ text: 'OK' }],
