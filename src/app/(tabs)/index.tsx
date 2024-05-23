@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
-import { Button, View } from 'react-native';
+import { View } from 'react-native';
+import { Button, Text } from 'tamagui';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
 import { DisplayableError } from '@/errors/DisplayableError';
@@ -40,7 +41,9 @@ function App() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button title="Upload Images" onPress={handleUpload} />
+      <Button backgroundColor="blue" onPress={handleUpload}>
+        <Text color="whitesmoke">Upload Images</Text>
+      </Button>
     </View>
   );
 }
