@@ -4,10 +4,9 @@ import { StorageAdapter, UploadRequest } from '@/ports/StorageAdapter';
 export interface MockStorageAdapter extends StorageAdapter {
   setNextError(error: Error): void;
   getUploadedRequests(): UploadRequest[];
-  clearUploadedRequests(): void;
 }
 
-export class MockStorageAdapter implements StorageAdapter {
+export class MockStorageAdapter implements MockStorageAdapter {
   private nextError: Error | null = null;
 
   private uploadedRequests: UploadRequest[] = [];
@@ -28,10 +27,6 @@ export class MockStorageAdapter implements StorageAdapter {
 
   getUploadedRequests(): UploadRequest[] {
     return this.uploadedRequests;
-  }
-
-  clearUploadedRequests(): void {
-    this.uploadedRequests = [];
   }
 }
 
