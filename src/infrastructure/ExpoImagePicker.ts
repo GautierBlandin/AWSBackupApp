@@ -8,7 +8,7 @@ import {
 } from '@/ports/ImagePicker';
 
 export class ExpoImagePicker implements ImagePicker {
-  async getMediaLibraryPermissionsAsync(): Promise<MediaLibraryPermissionResponse> {
+  async requestMediaLibraryPermissionsAsync(): Promise<MediaLibraryPermissionResponse> {
     const { status } = await ExpoImagePickerImport.getMediaLibraryPermissionsAsync();
 
     return {
@@ -25,17 +25,17 @@ export class ExpoImagePicker implements ImagePicker {
 
     if (result.canceled) {
       return {
-        cancelled: true,
+        canceled: true,
         assets: null,
       };
     }
     const assets: ImagePickerAsset[] = result.assets.map((asset) => ({
       uri: asset.uri,
-      filename: asset.fileName,
+      fileName: asset.fileName,
     }));
 
     return {
-      cancelled: false,
+      canceled: false,
       assets,
     };
   }

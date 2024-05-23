@@ -1,10 +1,12 @@
 import { inject } from '@ab/di-container';
+import { toByteArray } from 'base64-js';
 import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
 import { DisplayableError } from '@/errors/DisplayableError';
 import { storageAdapterToken } from '@/ports/StorageAdapter.token';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
-import { toByteArray } from 'base64-js';
+import { imagePickerToken } from '@/ports/ImagePicker.token';
+import { fileSystemToken } from '@/ports/FileSystem.token';
+import { ImagePickerAsset, MediaTypeOptions } from '@/ports/ImagePicker';
+import { EncodingType } from '@/ports/FileSystem';
 
 export interface UploadUseCaseOutput {
   status: 'success';
@@ -15,6 +17,10 @@ export class UploadUseCase {
   private readonly credentialsRepository = inject(credentialsRepositoryToken);
 
   private readonly storageAdapter = inject(storageAdapterToken);
+
+  private readonly ImagePicker = inject(imagePickerToken);
+
+  private readonly FileSystem = inject(fileSystemToken);
 
   public async handleUpload(): Promise<UploadUseCaseOutput> {
     await this.checkCredentials();
@@ -50,7 +56,7 @@ export class UploadUseCase {
   }
 
   private async checkAppPermissions() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await this.ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       throw new DisplayableError(
         'You need to grant permission to access the media library in order to upload images.',
@@ -60,24 +66,24 @@ export class UploadUseCase {
   }
 
   private async requestUserSelection() {
-    return ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    return this.ImagePicker.launchImageLibraryAsync({
+      mediaTypes: MediaTypeOptions.Images,
       quality: 1,
       allowsMultipleSelection: true,
     });
   }
 
-  private uploadUserSelectedAssets(assets: ImagePicker.ImagePickerAsset[]) {
+  private uploadUserSelectedAssets(assets: ImagePickerAsset[]) {
     return assets.map(async (asset) => {
       const fileUri = asset.uri;
-      const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      const fileInfo = await this.FileSystem.getInfoAsync(fileUri);
 
       if (!fileInfo.exists) {
         return undefined;
       }
 
-      const fileContent = await FileSystem.readAsStringAsync(fileUri, {
-        encoding: FileSystem.EncodingType.Base64,
+      const fileContent = await this.FileSystem.readAsStringAsync(fileUri, {
+        encoding: EncodingType.Base64,
       });
 
       const uint8Array = toByteArray(fileContent);

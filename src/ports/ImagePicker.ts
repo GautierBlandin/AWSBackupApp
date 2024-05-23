@@ -1,5 +1,5 @@
 export interface ImagePicker {
-  getMediaLibraryPermissionsAsync: () => Promise<MediaLibraryPermissionResponse>;
+  requestMediaLibraryPermissionsAsync: () => Promise<MediaLibraryPermissionResponse>;
   launchImageLibraryAsync: (options: ImagePickerOptions) => Promise<ImagePickerResult>;
 }
 
@@ -31,18 +31,18 @@ export type MediaLibraryPermissionResponse = {
 export type ImagePickerResult = ImagePickerSuccessResult | ImagePickerErrorResult;
 
 export type ImagePickerSuccessResult = {
-  cancelled: false;
+  canceled: false;
   assets: ImagePickerAsset[];
 };
 
 export type ImagePickerErrorResult = {
-  cancelled: true;
+  canceled: true;
   assets: null;
 };
 
 export type ImagePickerAsset = {
   uri: string;
-  filename: string | null | undefined;
+  fileName: string | null | undefined;
 };
 
 export enum PermissionStatus {
