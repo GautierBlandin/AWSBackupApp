@@ -30,7 +30,12 @@ module.exports = {
       }
     }
   ],
-  ignorePatterns: [".eslintrc.js", "scripts/reset-project.js", "babel.config.js"]
+  "ignorePatterns": [
+    ".eslintrc.js",
+    "scripts/reset-project.js",
+    "babel.config.js",
+    "expo-env.d.ts",
+  ]
 }
 
 
