@@ -3,14 +3,14 @@ import {
 } from '@/ports/FileSystem';
 
 export class MockFileSystem implements FileSystem {
-  private files: { key: string; content: string }[] = [];
+  private files: { uri: string; content: string }[] = [];
 
-  public setFiles(files: { key: string; content: string }[]) {
+  public setFiles(files: { uri: string; content: string }[]) {
     this.files = files;
   }
 
   public async getInfoAsync(fileUri: string): Promise<GetInfoResponse> {
-    const fileExists = this.files.some((file) => file.key === fileUri);
+    const fileExists = this.files.some((file) => file.uri === fileUri);
     return {
       exists: fileExists,
     };
@@ -20,7 +20,7 @@ export class MockFileSystem implements FileSystem {
     fileUri: string,
     options: ReadAsStringAsyncOptions,
   ): Promise<string> {
-    const foundFile = this.files.find((file) => file.key === fileUri);
+    const foundFile = this.files.find((file) => file.uri === fileUri);
 
     if (!foundFile) {
       throw new Error(`File not found: ${fileUri}`);

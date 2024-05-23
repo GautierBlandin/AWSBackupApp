@@ -76,6 +76,12 @@ export class UploadUseCase {
   private uploadUserSelectedAssets(assets: ImagePickerAsset[]) {
     return assets.map(async (asset) => {
       const fileUri = asset.uri;
+      const { fileName } = asset;
+
+      if (!fileName) {
+        return undefined;
+      }
+
       const fileInfo = await this.FileSystem.getInfoAsync(fileUri);
 
       if (!fileInfo.exists) {
@@ -89,7 +95,7 @@ export class UploadUseCase {
       const uint8Array = toByteArray(fileContent);
 
       const params = {
-        Key: asset.fileName || 'image.jpg',
+        Key: fileName,
         Body: uint8Array,
         ContentType: 'image/jpeg',
       };
