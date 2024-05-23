@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
-import { UploadRequest } from '@/ports/StorageAdapter';
 import { inject } from '@ab/di-container';
+import { UploadRequest } from '@/ports/StorageAdapter';
 import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
 
 export class S3StorageAdapter {
