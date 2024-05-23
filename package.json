@@ -16,6 +16,8 @@
     "@expo/vector-icons": "^14.0.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/native": "^6.0.2",
+    "@tamagui/config": "^1.98.3",
+    "@tamagui/core": "^1.98.3",
     "@types/aws-sdk": "^2.7.0",
     "aws-sdk": "^2.1619.0",
     "base64-js": "^1.5.1",
@@ -40,6 +42,7 @@
     "react-native-web": "~0.19.10",
     "reflect-metadata": "^0.2.2",
     "styled-components": "^6.1.11",
+    "tamagui": "^1.98.3",
     "ts-node": "^10.9.2",
     "tsyringe": "^4.8.0"
   },
