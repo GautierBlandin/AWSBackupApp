@@ -9,7 +9,7 @@ import { ImagePickerAsset, MediaTypeOptions } from '@/ports/ImagePicker';
 import { EncodingType } from '@/ports/FileSystem';
 
 export interface UploadUseCaseOutput {
-  status: 'success';
+  status: 'success' | 'canceled';
   message: string;
 }
 
@@ -35,11 +35,15 @@ export class UploadUseCase {
       } catch (error) {
         throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
       }
+      return {
+        status: 'success',
+        message: 'Upload successful',
+      };
     }
 
     return {
-      status: 'success',
-      message: 'Upload successful',
+      status: 'canceled',
+      message: 'Upload canceled',
     };
   }
 

@@ -11,14 +11,16 @@ function App() {
 
   const handleUpload = async () => {
     try {
-      await uploadUseCase.handleUpload();
+      const result = await uploadUseCase.handleUpload();
 
-      Alert.alert(
-        'Upload Successful',
-        'The selected images have been uploaded successfully.',
-        [{ text: 'OK' }],
-        { cancelable: false },
-      );
+      if (result.status === 'success') {
+        Alert.alert(
+          'Upload Successful',
+          'The selected images have been uploaded successfully.',
+          [{ text: 'OK' }],
+          { cancelable: false },
+        );
+      }
     } catch (error) {
       if (error instanceof DisplayableError) {
         Alert.alert(
