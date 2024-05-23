@@ -28,22 +28,23 @@ export class UploadUseCase {
 
     const userSelectedAssetsResult = await this.requestUserSelection();
 
-    if (!userSelectedAssetsResult.canceled) {
-      try {
-        const uploadPromises = this.uploadUserSelectedAssets(userSelectedAssetsResult.assets);
-        await Promise.all(uploadPromises);
-      } catch (error) {
-        throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
-      }
+    if (userSelectedAssetsResult.canceled) {
       return {
-        status: 'success',
-        message: 'Upload successful',
+        status: 'canceled',
+        message: 'Upload canceled',
       };
     }
 
+    try {
+      const uploadPromises = this.uploadUserSelectedAssets(userSelectedAssetsResult.assets);
+      await Promise.all(uploadPromises);
+    } catch (error) {
+      throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
+    }
+
     return {
-      status: 'canceled',
-      message: 'Upload canceled',
+      status: 'success',
+      message: 'Upload successful',
     };
   }
 
