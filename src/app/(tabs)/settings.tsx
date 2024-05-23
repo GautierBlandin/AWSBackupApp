@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
 import { SettingsUseCase } from '@/useCases/settings';
+import crossPlatformAlert from '@/components/CrossPlatformAlert';
 
 function Settings() {
   const [accessKey, setAccessKey] = useState('');
@@ -28,6 +29,8 @@ function Settings() {
       region,
       bucketName,
     });
+
+    crossPlatformAlert('Credentials Saved', 'Your credentials have been saved.', [{ text: 'OK' }], { cancelable: false });
   };
 
   return (
