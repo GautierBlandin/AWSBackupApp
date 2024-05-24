@@ -1,4 +1,4 @@
-export interface CredentialsRepository {
+export interface SettingsRepository {
   setAWSAccessKeyId(awsAccessKeyId: string | undefined): Promise<void>;
   getAWSAccessKeyId(): Promise<string | undefined>;
   setAWSSecretAccessKey(awsSecretAccessKey: string | undefined): Promise<void>;

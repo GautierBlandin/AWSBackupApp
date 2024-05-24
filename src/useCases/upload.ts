@@ -1,6 +1,6 @@
 import { inject } from '@ab/di-container';
 import { toByteArray } from 'base64-js';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
 import { DisplayableError } from '@/errors/DisplayableError';
 import { storageAdapterToken } from '@/ports/StorageAdapter.token';
 import { imagePickerToken } from '@/ports/ImagePicker.token';
@@ -14,7 +14,7 @@ export interface UploadUseCaseOutput {
 }
 
 export class UploadUseCase {
-  private readonly credentialsRepository = inject(credentialsRepositoryToken);
+  private readonly credentialsRepository = inject(settingsRepositoryToken);
 
   private readonly storageAdapter = inject(storageAdapterToken);
 

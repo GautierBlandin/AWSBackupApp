@@ -1,5 +1,5 @@
 import { inject } from '@ab/di-container';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
 
 interface Credentials {
   accessKey: string | undefined;
@@ -10,7 +10,7 @@ interface Credentials {
 }
 
 export class SettingsUseCase {
-  private readonly credentialsRepository = inject(credentialsRepositoryToken);
+  private readonly credentialsRepository = inject(settingsRepositoryToken);
 
   private credentials: Credentials = {
     accessKey: undefined,

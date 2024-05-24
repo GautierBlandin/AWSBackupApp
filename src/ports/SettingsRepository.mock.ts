@@ -1,6 +1,6 @@
-import { CredentialsRepository } from '@/ports/CredentialsRepository';
+import { SettingsRepository } from '@/ports/SettingsRepository';
 
-export class MockCredentialsRepository implements CredentialsRepository {
+export class MockSettingsRepository implements SettingsRepository {
   private awsAccessKeyId: string | undefined;
 
   private awsSecretAccessKey: string | undefined;

@@ -1,10 +1,10 @@
 import AWS from 'aws-sdk';
 import { inject } from '@ab/di-container';
 import { UploadRequest } from '@/ports/StorageAdapter';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
 
 export class S3StorageAdapter {
-  private readonly credentialsRepository = inject(credentialsRepositoryToken);
+  private readonly credentialsRepository = inject(settingsRepositoryToken);
 
   public async upload(uploadRequest: UploadRequest): Promise<void> {
     const region = await this.credentialsRepository.getAWSRegion();

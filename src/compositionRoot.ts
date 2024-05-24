@@ -5,8 +5,8 @@ import { S3StorageAdapter } from '@/infrastructure/S3StorageAdapter';
 import { storageAdapterToken } from '@/ports/StorageAdapter.token';
 import { imagePickerToken } from '@/ports/ImagePicker.token';
 import { ExpoImagePicker } from '@/infrastructure/ExpoImagePicker';
-import { AsyncStorageCredentialsRepository } from '@/infrastructure/AsyncStorageCredentialsRepository';
-import { credentialsRepositoryToken } from '@/ports/CredentialsRepository.token';
+import { AsyncStorageSettingsRepository } from '@/infrastructure/AsyncStorageSettingsRepository';
+import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
 
 const infrastructureRegistered = {
   loaded: false,
@@ -17,7 +17,7 @@ export function registerInfrastructure() {
     register(fileSystemToken, { useClass: ExpoFileSystem });
     register(storageAdapterToken, { useClass: S3StorageAdapter });
     register(imagePickerToken, { useClass: ExpoImagePicker });
-    register(credentialsRepositoryToken, { useClass: AsyncStorageCredentialsRepository });
+    register(settingsRepositoryToken, { useClass: AsyncStorageSettingsRepository });
   }
 
   infrastructureRegistered.loaded = true;

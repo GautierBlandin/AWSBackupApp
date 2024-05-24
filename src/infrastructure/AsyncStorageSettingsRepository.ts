@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CredentialsRepository } from '@/ports/CredentialsRepository';
+import { SettingsRepository } from '@/ports/SettingsRepository';
 
-export class AsyncStorageCredentialsRepository implements CredentialsRepository {
+export class AsyncStorageSettingsRepository implements SettingsRepository {
   public async setAWSAccessKeyId(awsAccessKeyId: string | undefined): Promise<void> {
     await AsyncStorage.setItem('AWS_ACCESS_KEY', awsAccessKeyId || '');
   }
