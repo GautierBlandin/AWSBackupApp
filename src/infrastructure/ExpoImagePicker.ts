@@ -1,4 +1,5 @@
 import * as ExpoImagePickerImport from 'expo-image-picker';
+import * as ExpoMediaLibrary from 'expo-media-library';
 import {
   ImagePicker,
   ImagePickerAsset,
@@ -9,7 +10,7 @@ import {
 
 export class ExpoImagePicker implements ImagePicker {
   async requestMediaLibraryPermissionsAsync(): Promise<MediaLibraryPermissionResponse> {
-    const { status } = await ExpoImagePickerImport.getMediaLibraryPermissionsAsync();
+    const { status } = await ExpoMediaLibrary.getPermissionsAsync();
 
     return {
       status,
