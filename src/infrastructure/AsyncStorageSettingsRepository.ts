@@ -38,6 +38,15 @@ export class AsyncStorageSettingsRepository implements SettingsRepository {
     return this.nullToUndefined(value);
   }
 
+  public async setBucketDirectory(bucketDirectory: string | undefined): Promise<void> {
+    await AsyncStorage.setItem('BUCKET_DIRECTORY', bucketDirectory || '');
+  }
+
+  public async getBucketDirectory(): Promise<string | undefined> {
+    const value = await AsyncStorage.getItem('BUCKET_DIRECTORY');
+    return this.nullToUndefined(value);
+  }
+
   private nullToUndefined(value: string | null): string | undefined {
     if (value === null) {
       return undefined;
