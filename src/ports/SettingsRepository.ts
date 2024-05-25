@@ -7,4 +7,6 @@ export interface SettingsRepository {
   getAWSRegion(): Promise<string | undefined>;
   setBucketName(bucketName: string | undefined): Promise<void>;
   getBucketName(): Promise<string | undefined>;
+  getBucketDirectory(): Promise<string | undefined>;
+  setBucketDirectory(bucketDirectory: string | undefined): Promise<void>;
 }

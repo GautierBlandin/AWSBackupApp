@@ -34,6 +34,7 @@ function Settings() {
   const [secretAccessKey, setSecretAccessKey] = useState('');
   const [region, setRegion] = useState('');
   const [bucketName, setBucketName] = useState('');
+  const [bucketDirectory, setBucketDirectory] = useState('');
 
   const settingsUseCase = useMemo(() => new SettingsUseCase(), []);
 
@@ -44,6 +45,7 @@ function Settings() {
       setSecretAccessKey(credentials.secretAccessKey || '');
       setRegion(credentials.region || '');
       setBucketName(credentials.bucketName || '');
+      setBucketDirectory(credentials.bucketDirectory || '');
     };
     fetchCredentials();
   }, [settingsUseCase]);
@@ -54,6 +56,7 @@ function Settings() {
       secretAccessKey,
       region,
       bucketName,
+      bucketDirectory,
     });
 
     crossPlatformAlert('Credentials Saved', 'Your credentials have been saved.', [{ text: 'OK' }], { cancelable: false });
@@ -82,6 +85,11 @@ function Settings() {
           label="Bucket Name"
           value={bucketName}
           onChangeText={setBucketName}
+        />
+        <FormInput
+          label="Bucket Directory"
+          value={bucketDirectory}
+          onChangeText={setBucketDirectory}
         />
         <Button
           backgroundColor="blue"

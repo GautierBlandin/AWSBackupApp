@@ -9,6 +9,8 @@ export class MockSettingsRepository implements SettingsRepository {
 
   private bucketName: string | undefined;
 
+  private bucketDirectory: string | undefined;
+
   async setAWSAccessKeyId(awsAccessKeyId: string | undefined): Promise<void> {
     this.awsAccessKeyId = awsAccessKeyId;
   }
@@ -39,5 +41,13 @@ export class MockSettingsRepository implements SettingsRepository {
 
   async getBucketName(): Promise<string | undefined> {
     return this.bucketName;
+  }
+
+  async getBucketDirectory(): Promise<string | undefined> {
+    return this.bucketDirectory;
+  }
+
+  async setBucketDirectory(bucketDirectory: string | undefined): Promise<void> {
+    this.bucketDirectory = bucketDirectory;
   }
 }

@@ -6,7 +6,7 @@ interface Credentials {
   secretAccessKey: string | undefined;
   region: string | undefined;
   bucketName: string | undefined;
-
+  bucketDirectory: string | undefined;
 }
 
 export class SettingsUseCase {
@@ -17,6 +17,7 @@ export class SettingsUseCase {
     secretAccessKey: undefined,
     region: undefined,
     bucketName: undefined,
+    bucketDirectory: undefined,
   };
 
   public async loadCredentials() {
@@ -25,23 +26,25 @@ export class SettingsUseCase {
       this.credentialsRepository.getAWSSecretAccessKey(),
       this.credentialsRepository.getAWSRegion(),
       this.credentialsRepository.getBucketName(),
+      this.credentialsRepository.getBucketDirectory(),
     ];
 
-    const [existingAccessKey, existingSecretAccessKey, existingRegion, existingBucketName] = await Promise.all(promises);
+    const [existingAccessKey,
+      existingSecretAccessKey,
+      existingRegion,
+      existingBucketName,
+      existingBucketDirectory,
+    ] = await Promise.all(promises);
 
     this.credentials = {
       accessKey: existingAccessKey,
       secretAccessKey: existingSecretAccessKey,
       region: existingRegion,
       bucketName: existingBucketName,
+      bucketDirectory: existingBucketDirectory,
     };
 
-    return {
-      accessKey: existingAccessKey,
-      secretAccessKey: existingSecretAccessKey,
-      region: existingRegion,
-      bucketName: existingBucketName,
-    };
+    return { ...this.credentials };
   }
 
   public async saveCredentials({
@@ -49,12 +52,14 @@ export class SettingsUseCase {
     secretAccessKey,
     region,
     bucketName,
+    bucketDirectory,
   }: Credentials) {
     this.credentials = {
       accessKey,
       secretAccessKey,
       region,
       bucketName,
+      bucketDirectory,
     };
 
     const promises = [
@@ -62,6 +67,7 @@ export class SettingsUseCase {
       this.credentialsRepository.setAWSSecretAccessKey(secretAccessKey),
       this.credentialsRepository.setAWSRegion(region),
       this.credentialsRepository.setBucketName(bucketName),
+      this.credentialsRepository.setBucketDirectory(bucketDirectory),
     ];
 
     await Promise.all(promises);
