@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { SettingsUseCase } from '@/useCases/settings';
 import crossPlatformAlert from '@/components/CrossPlatformAlert';
 import {
-  Button, Input, Text, View, YStack,
+  Button, Input, ScrollView, Text, View, YStack,
 } from 'tamagui';
 
 function FormInput({
@@ -63,7 +63,7 @@ function Settings() {
   };
 
   return (
-    <View>
+    <ScrollView>
       <YStack margin={16} gap={16}>
         <FormInput
           label="Access Key"
@@ -98,7 +98,7 @@ function Settings() {
           <Text color="whitesmoke">Save Credentials</Text>
         </Button>
       </YStack>
-    </View>
+    </ScrollView>
   );
 }
 
