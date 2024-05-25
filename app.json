@@ -20,7 +20,12 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gautierblandin.bucketbackup"
+      "package": "com.gautierblandin.bucketbackup",
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "ACCESS_MEDIA_LOCATION",
+        "MEDIA_LIBRARY"
+      ]
     },
     "web": {
       "bundler": "metro",
