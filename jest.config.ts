@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
   },
   testPathIgnorePatterns: [
     '/node_modules/',
+    '\\.(tsx)$',
   ],
   moduleNameMapper: {
     '^@ab/di-container$': '<rootDir>/src/lib/di-container/index',
