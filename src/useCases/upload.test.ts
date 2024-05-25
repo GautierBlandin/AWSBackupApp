@@ -26,6 +26,20 @@ describe('upload', () => {
     ]);
   });
 
+  it('should add prefix to filename', async () => {
+    const { useCase, storageAdapter, settingsRepository } = setup();
+    settingsRepository.setBucketDirectory('pixel8');
+
+    await useCase.handleUpload();
+
+    expect(storageAdapter.getUploadedRequests()).toMatchObject([
+      {
+        Key: 'pixel8/image1.jpg',
+      },
+      { Key: 'pixel8/image2.jpg' },
+    ]);
+  });
+
   it('should not upload if filename is undefined', async () => {
     const { useCase, storageAdapter, imagePicker } = setup();
 

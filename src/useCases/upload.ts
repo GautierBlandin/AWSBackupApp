@@ -7,6 +7,7 @@ import { imagePickerToken } from '@/ports/ImagePicker.token';
 import { fileSystemToken } from '@/ports/FileSystem.token';
 import { ImagePickerAsset, MediaTypeOptions } from '@/ports/ImagePicker';
 import { EncodingType } from '@/ports/FileSystem';
+import { Linking } from 'react-native';
 
 export interface UploadUseCaseOutput {
   status: 'success' | 'canceled';
@@ -63,6 +64,8 @@ export class UploadUseCase {
   private async checkAppPermissions() {
     const { status } = await this.ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
+      await Linking.openSettings();
+
       throw new DisplayableError(
         'You need to grant permission to access the media library in order to upload images.',
         'Permission Denied',
@@ -99,14 +102,26 @@ export class UploadUseCase {
 
       const uint8Array = toByteArray(fileContent);
 
+      const Key = await this.computeKeyFromFilename(fileName);
+
       const params = {
-        Key: fileName,
+        Key,
         Body: uint8Array,
         ContentType: 'image/jpeg',
       };
 
       return this.storageAdapter.upload(params);
     });
+  }
+
+  private async computeKeyFromFilename(filename: string): Promise<string> {
+    const bucketDirectory = await this.credentialsRepository.getBucketDirectory();
+
+    if (bucketDirectory) {
+      return `${bucketDirectory}/${filename}`;
+    }
+
+    return filename;
   }
 }
 
