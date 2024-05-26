@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Button, Text } from 'tamagui';
+import { Button, Text, Progress } from 'tamagui';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
 import { DisplayableError } from '@/errors/DisplayableError';
@@ -8,12 +8,22 @@ import crossPlatformAlert from '@/components/CrossPlatformAlert';
 
 function App() {
   const navigation = useNavigation();
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const uploadUseCase = useMemo(() => new UploadUseCase(), []);
 
   const handleUpload = async () => {
     try {
-      const result = await uploadUseCase.handleUpload();
+      const progressCallback = (progress: number) => {
+        setUploadProgress(progress);
+      };
+
+      const result = await uploadUseCase.handleUpload({
+        progressCallback,
+        onUploadStart: () => setIsUploading(true),
+        onUploadEnd: () => setIsUploading(false),
+      });
 
       if (result.status === 'success') {
         crossPlatformAlert(
@@ -32,6 +42,9 @@ function App() {
           { cancelable: false },
         );
       }
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -41,8 +54,18 @@ function App() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button backgroundColor="blue" onPress={handleUpload}>
-        <Text color="whitesmoke">Upload Images</Text>
+      {isUploading && (
+        <View style={{ marginBottom: 20 }}>
+          <Text>
+            Uploading:
+            {uploadProgress}
+            %
+          </Text>
+          <Progress value={uploadProgress} max={100} />
+        </View>
+      )}
+      <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
+        <Text color="whitesmoke">{isUploading ? 'Uploading...' : 'Upload Images'}</Text>
       </Button>
     </View>
   );

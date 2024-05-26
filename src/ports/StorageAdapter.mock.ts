@@ -1,5 +1,5 @@
 import { createInjectionToken } from '@ab/di-container';
-import { StorageAdapter, UploadRequest } from '@/ports/StorageAdapter';
+import { StorageAdapter, UploadRequest, UploadRequestOptions } from '@/ports/StorageAdapter';
 
 export interface MockStorageAdapter extends StorageAdapter {
   setNextError(error: Error): void;
@@ -11,12 +11,33 @@ export class MockStorageAdapter implements MockStorageAdapter {
 
   private uploadedRequests: UploadRequest[] = [];
 
-  async upload(uploadRequest: UploadRequest): Promise<void> {
+  async upload(uploadRequest: UploadRequest, options: UploadRequestOptions): Promise<void> {
     if (this.nextError) {
       const error = this.nextError;
       this.nextError = null;
       throw error;
     }
+
+    options.progressCallback?.({
+      loaded: 0,
+      total: 1000,
+    });
+    options.progressCallback?.({
+      loaded: 250,
+      total: 1000,
+    });
+    options.progressCallback?.({
+      loaded: 500,
+      total: 1000,
+    });
+    options.progressCallback?.({
+      loaded: 750,
+      total: 1000,
+    });
+    options.progressCallback?.({
+      loaded: 1000,
+      total: 1000,
+    });
     // Storing the uploaded request
     this.uploadedRequests.push(uploadRequest);
   }

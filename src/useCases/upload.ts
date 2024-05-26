@@ -8,10 +8,27 @@ import { fileSystemToken } from '@/ports/FileSystem.token';
 import { ImagePickerAsset, MediaTypeOptions } from '@/ports/ImagePicker';
 import { EncodingType } from '@/ports/FileSystem';
 import { Linking } from 'react-native';
+import mime from 'mime';
 
 export interface UploadUseCaseOutput {
   status: 'success' | 'canceled';
   message: string;
+}
+
+export interface UploadUseCaseInput {
+  progressCallback?: (progress: number) => void;
+  onUploadStart?: () => void;
+  onUploadEnd?: () => void;
+}
+
+export interface AssetWithContent {
+  uri: string;
+  fileName: string;
+  fileInfo: {
+    exists: true;
+    size: number;
+  };
+  fileContent: string;
 }
 
 export class UploadUseCase {
@@ -23,7 +40,7 @@ export class UploadUseCase {
 
   private readonly FileSystem = inject(fileSystemToken);
 
-  public async handleUpload(): Promise<UploadUseCaseOutput> {
+  public async handleUpload(input?: UploadUseCaseInput): Promise<UploadUseCaseOutput> {
     await this.checkCredentials();
     await this.checkAppPermissions();
 
@@ -37,8 +54,7 @@ export class UploadUseCase {
     }
 
     try {
-      const uploadPromises = this.uploadUserSelectedAssets(userSelectedAssetsResult.assets);
-      await Promise.all(uploadPromises);
+      await this.uploadUserSelectedAssets(userSelectedAssetsResult.assets, input);
     } catch (error) {
       throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
     }
@@ -81,9 +97,71 @@ export class UploadUseCase {
     });
   }
 
-  private uploadUserSelectedAssets(assets: ImagePickerAsset[]) {
-    return assets.map(async (asset) => {
+  private async uploadUserSelectedAssets(assets: ImagePickerAsset[], options?: UploadUseCaseInput) {
+    const { progressCallback, onUploadStart, onUploadEnd } = options || {};
+
+    if (onUploadStart) {
+      onUploadStart();
+    }
+
+    const assetsWithContent = await this.assetsToAssetsWithContent(assets);
+
+    progressCallback?.(20);
+
+    const uploadProgressArray = assetsWithContent.map((asset) => ({
+      loaded: 0,
+      total: asset.fileInfo.size,
+    }));
+
+    const uploadProgressObject = {
+      uploadProgressArray,
+      totalLoaded: 0,
+      totalTotal: assetsWithContent.reduce((total, asset) => total + asset.fileInfo.size, 0),
+    };
+
+    const promises = assetsWithContent.map(async (asset, index) => {
+      const uint8Array = toByteArray(asset.fileContent);
+
+      const Key = await this.addBucketDirectoryPrefix(asset.fileName);
+
+      const params = {
+        Key,
+        Body: uint8Array,
+        ContentType: mime.getType(asset.fileName) || 'application/octet-stream',
+      };
+
+      return this.storageAdapter.upload(params, {
+        progressCallback: (progress) => {
+          uploadProgressObject.totalLoaded += progress.loaded - uploadProgressArray[index].loaded;
+          uploadProgressArray[index].loaded = progress.loaded;
+          progressCallback?.(35 + Math.round((uploadProgressObject.totalLoaded / uploadProgressObject.totalTotal) * 65));
+        },
+      });
+    });
+
+    progressCallback?.(35);
+
+    await Promise.all(promises);
+
+    if (onUploadEnd) {
+      onUploadEnd();
+    }
+  }
+
+  private async addBucketDirectoryPrefix(filename: string): Promise<string> {
+    const bucketDirectory = await this.credentialsRepository.getBucketDirectory();
+
+    if (bucketDirectory) {
+      return `${bucketDirectory}/${filename}`;
+    }
+
+    return filename;
+  }
+
+  private async assetsToAssetsWithContent(assets: ImagePickerAsset[]): Promise<AssetWithContent[]> {
+    const assetsWithFileInfo = await Promise.all((assets).map(async (asset) => {
       const fileUri = asset.uri;
+
       const { fileName } = asset;
 
       if (!fileName) {
@@ -96,32 +174,30 @@ export class UploadUseCase {
         return undefined;
       }
 
-      const fileContent = await this.FileSystem.readAsStringAsync(fileUri, {
+      return {
+        ...asset,
+        fileInfo,
+      };
+    }));
+
+    const assetsWithContent = await Promise.all(assetsWithFileInfo.map(async (asset) => {
+      if (!asset) {
+        return undefined;
+      }
+
+      const { uri } = asset;
+
+      const fileContent = await this.FileSystem.readAsStringAsync(uri, {
         encoding: EncodingType.Base64,
       });
 
-      const uint8Array = toByteArray(fileContent);
-
-      const Key = await this.computeKeyFromFilename(fileName);
-
-      const params = {
-        Key,
-        Body: uint8Array,
-        ContentType: 'image/jpeg',
+      return {
+        ...asset,
+        fileContent,
       };
+    }));
 
-      return this.storageAdapter.upload(params);
-    });
-  }
-
-  private async computeKeyFromFilename(filename: string): Promise<string> {
-    const bucketDirectory = await this.credentialsRepository.getBucketDirectory();
-
-    if (bucketDirectory) {
-      return `${bucketDirectory}/${filename}`;
-    }
-
-    return filename;
+    return assetsWithContent.filter((asset): asset is AssetWithContent => asset !== undefined);
   }
 }
 

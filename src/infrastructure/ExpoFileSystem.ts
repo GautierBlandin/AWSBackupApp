@@ -5,9 +5,16 @@ import {
 
 export class ExpoFileSystem implements FileSystemInterface {
   async getInfoAsync(fileUri: string): Promise<GetInfoResponse> {
-    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+    const fileInfo = await FileSystem.getInfoAsync(fileUri, { size: true });
+
+    if (!fileInfo.exists) {
+      return {
+        exists: false,
+      };
+    }
     return {
-      exists: fileInfo.exists,
+      exists: true,
+      size: fileInfo.size,
     };
   }
 
