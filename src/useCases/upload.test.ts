@@ -40,6 +40,31 @@ describe('upload', () => {
     ]);
   });
 
+  describe('upload callback', () => {
+    it('should call onUploadStart and onUploadEnd', async () => {
+      const { useCase } = setup();
+      const onUploadStart = jest.fn();
+      const onUploadEnd = jest.fn();
+
+      await useCase.handleUpload({ onUploadStart, onUploadEnd });
+
+      expect(onUploadStart).toHaveBeenCalledTimes(1);
+      expect(onUploadEnd).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call progressCallback', async () => {
+      const { useCase } = setup();
+      const progressCallback = jest.fn();
+
+      await useCase.handleUpload({ progressCallback });
+
+      expect(progressCallback).toHaveBeenCalledTimes(3);
+      expect(progressCallback).toHaveBeenNthCalledWith(1, 0);
+      expect(progressCallback).toHaveBeenNthCalledWith(2, 50);
+      expect(progressCallback).toHaveBeenNthCalledWith(3, 100);
+    });
+  });
+
   it('should not upload if filename is undefined', async () => {
     const { useCase, storageAdapter, imagePicker } = setup();
 
