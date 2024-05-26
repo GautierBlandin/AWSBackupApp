@@ -185,48 +185,6 @@ export class UploadUseCase {
       fileContent,
     };
   }
-
-  private async assetsToAssetsWithContent(assets: ImagePickerAsset[]): Promise<AssetWithContent[]> {
-    const assetsWithFileInfo = await Promise.all((assets).map(async (asset) => {
-      const fileUri = asset.uri;
-
-      const { fileName } = asset;
-
-      if (!fileName) {
-        return undefined;
-      }
-
-      const fileInfo = await this.FileSystem.getInfoAsync(fileUri);
-
-      if (!fileInfo.exists) {
-        return undefined;
-      }
-
-      return {
-        ...asset,
-        fileInfo,
-      };
-    }));
-
-    const assetsWithContent = await Promise.all(assetsWithFileInfo.map(async (asset) => {
-      if (!asset) {
-        return undefined;
-      }
-
-      const { uri } = asset;
-
-      const fileContent = await this.FileSystem.readAsStringAsync(uri, {
-        encoding: EncodingType.Base64,
-      });
-
-      return {
-        ...asset,
-        fileContent,
-      };
-    }));
-
-    return assetsWithContent.filter((asset): asset is AssetWithContent => asset !== undefined);
-  }
 }
 
 export class MissingCredentialsError extends DisplayableError {
