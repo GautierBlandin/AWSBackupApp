@@ -61,7 +61,9 @@ function App() {
             {uploadProgress}
             %
           </Text>
-          <Progress value={uploadProgress} max={100} />
+          <Progress value={uploadProgress} max={100}>
+            <Progress.Indicator />
+          </Progress>
         </View>
       )}
       <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
