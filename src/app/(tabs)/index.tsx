@@ -7,6 +7,7 @@ import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
 import { DisplayableError } from '@/errors/DisplayableError';
 import crossPlatformAlert from '@/components/CrossPlatformAlert';
+import UploadProgressBar from '@/components/UploadProgressBar';
 
 function App() {
   const navigation = useNavigation();
@@ -56,19 +57,7 @@ function App() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      {isUploading && (
-      <YStack gap={8}>
-        <Text textAlign="center">
-          Uploading:
-          {' '}
-          {uploadProgress}
-          %
-        </Text>
-        <Progress value={uploadProgress} max={100} size={`$${6}`}>
-          <Progress.Indicator />
-        </Progress>
-      </YStack>
-      )}
+      {isUploading && <UploadProgressBar uploadProgress={uploadProgress} />}
       {!isUploading && (
       <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
         <Text color="whitesmoke">{isUploading ? 'Uploading...' : 'Upload Images'}</Text>
