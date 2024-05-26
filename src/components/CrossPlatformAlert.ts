@@ -1,6 +1,7 @@
 import { Alert, Platform } from 'react-native';
 
 const alertPolyfill = (title: string, description: string) => {
+  // eslint-disable-next-line no-alert
   alert(`${title}\n\n${description}`);
 };
 
