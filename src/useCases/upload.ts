@@ -25,7 +25,6 @@ export interface AssetWithContent {
   fileName: string;
   fileInfo: {
     exists: true;
-    size: number;
   };
   fileContent: string;
 }
@@ -182,7 +181,7 @@ export class UploadUseCase {
     return {
       ...asset,
       fileName,
-      fileInfo,
+      fileInfo: { exists: true },
       fileContent,
     };
   }
