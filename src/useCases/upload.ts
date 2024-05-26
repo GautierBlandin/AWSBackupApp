@@ -7,7 +7,6 @@ import { imagePickerToken } from '@/ports/ImagePicker.token';
 import { fileSystemToken } from '@/ports/FileSystem.token';
 import { ImagePickerAsset, MediaTypeOptions } from '@/ports/ImagePicker';
 import { EncodingType } from '@/ports/FileSystem';
-import { Linking } from 'react-native';
 import mime from 'mime';
 
 export interface UploadUseCaseOutput {
@@ -80,8 +79,6 @@ export class UploadUseCase {
   private async checkAppPermissions() {
     const { status } = await this.ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      await Linking.openSettings();
-
       throw new DisplayableError(
         'You need to grant permission to access the media library in order to upload images.',
         'Permission Denied',
@@ -100,51 +97,58 @@ export class UploadUseCase {
   private async uploadUserSelectedAssets(assets: ImagePickerAsset[], options?: UploadUseCaseInput) {
     const { progressCallback, onUploadStart, onUploadEnd } = options || {};
 
-    if (onUploadStart) {
-      onUploadStart();
-    }
+    onUploadStart?.();
+    progressCallback?.(0);
 
-    const assetsWithContent = await this.assetsToAssetsWithContent(assets);
+    let processedAssets = 0;
+    let assetToProcessPointer = 0;
+    const batchSize = 5;
+    let activeSlots = 0;
 
-    progressCallback?.(20);
-
-    const uploadProgressArray = assetsWithContent.map((asset) => ({
-      loaded: 0,
-      total: asset.fileInfo.size,
-    }));
-
-    const uploadProgressObject = {
-      uploadProgressArray,
-      totalLoaded: 0,
-      totalTotal: assetsWithContent.reduce((total, asset) => total + asset.fileInfo.size, 0),
+    const processAssets = async () => {
+      while (processedAssets < assets.length) {
+        if (activeSlots < batchSize && assetToProcessPointer < assets.length) {
+          activeSlots += 1;
+          const asset = assets[assetToProcessPointer];
+          assetToProcessPointer += 1;
+          // eslint-disable-next-line @typescript-eslint/no-loop-func
+          this.processAsset(asset).finally(() => {
+            processedAssets += 1;
+            progressCallback?.(Math.round((processedAssets / assets.length) * 100));
+            activeSlots -= 1;
+          });
+        } else {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => { setTimeout(resolve, 100); });
+        }
+      }
     };
 
-    const promises = assetsWithContent.map(async (asset, index) => {
-      const uint8Array = toByteArray(asset.fileContent);
+    await processAssets();
 
-      const Key = await this.addBucketDirectoryPrefix(asset.fileName);
+    onUploadEnd?.();
+  }
 
-      const params = {
-        Key,
-        Body: uint8Array,
-        ContentType: mime.getType(asset.fileName) || 'application/octet-stream',
-      };
+  private async processAsset(asset: ImagePickerAsset) {
+    const assetWithContent = await this.assetToAssetWithContent(asset);
 
-      return this.storageAdapter.upload(params, {
-        progressCallback: (progress) => {
-          uploadProgressObject.totalLoaded += progress.loaded - uploadProgressArray[index].loaded;
-          uploadProgressArray[index].loaded = progress.loaded;
-          progressCallback?.(35 + Math.round((uploadProgressObject.totalLoaded / uploadProgressObject.totalTotal) * 65));
-        },
-      });
-    });
+    if (!assetWithContent) {
+      return;
+    }
 
-    progressCallback?.(35);
+    const uint8Array = toByteArray(assetWithContent.fileContent);
+    const Key = await this.addBucketDirectoryPrefix(assetWithContent.fileName);
 
-    await Promise.all(promises);
+    const params = {
+      Key,
+      Body: uint8Array,
+      ContentType: mime.getType(assetWithContent.fileName) || 'application/octet-stream',
+    };
 
-    if (onUploadEnd) {
-      onUploadEnd();
+    try {
+      await this.storageAdapter.upload(params);
+    } catch (error) {
+      throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
     }
   }
 
@@ -156,6 +160,31 @@ export class UploadUseCase {
     }
 
     return filename;
+  }
+
+  private async assetToAssetWithContent(asset: ImagePickerAsset): Promise<AssetWithContent | undefined> {
+    const { uri, fileName } = asset;
+
+    if (!fileName) {
+      return undefined;
+    }
+
+    const fileInfo = await this.FileSystem.getInfoAsync(uri);
+
+    if (!fileInfo.exists) {
+      return undefined;
+    }
+
+    const fileContent = await this.FileSystem.readAsStringAsync(uri, {
+      encoding: EncodingType.Base64,
+    });
+
+    return {
+      ...asset,
+      fileName,
+      fileInfo,
+      fileContent,
+    };
   }
 
   private async assetsToAssetsWithContent(assets: ImagePickerAsset[]): Promise<AssetWithContent[]> {
