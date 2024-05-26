@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Button, Text, Progress } from 'tamagui';
+import {
+  Button, Text, Progress, YStack,
+} from 'tamagui';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '@/useCases/upload';
 import { DisplayableError } from '@/errors/DisplayableError';
@@ -55,16 +57,17 @@ function App() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {isUploading && (
-        <View style={{ marginBottom: 20 }}>
-          <Text>
-            Uploading:
-            {uploadProgress}
-            %
-          </Text>
-          <Progress value={uploadProgress} max={100}>
-            <Progress.Indicator />
-          </Progress>
-        </View>
+      <YStack gap={8}>
+        <Text textAlign="center">
+          Uploading:
+          {' '}
+          {uploadProgress}
+          %
+        </Text>
+        <Progress value={uploadProgress} max={100} size={`$${6}`}>
+          <Progress.Indicator />
+        </Progress>
+      </YStack>
       )}
       {!isUploading && (
       <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
