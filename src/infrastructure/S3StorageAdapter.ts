@@ -1,14 +1,12 @@
 import AWS from 'aws-sdk';
 import { inject } from '@ab/di-container';
-import { UploadRequest, UploadRequestOptions } from '@/ports/StorageAdapter';
+import { UploadRequest } from '@/ports/StorageAdapter';
 import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
 
 export class S3StorageAdapter {
   private readonly credentialsRepository = inject(settingsRepositoryToken);
 
-  public async upload(uploadRequest: UploadRequest, options?: UploadRequestOptions): Promise<void> {
-    const { progressCallback } = options || {};
-
+  public async upload(uploadRequest: UploadRequest): Promise<void> {
     const region = await this.credentialsRepository.getAWSRegion();
     const awsAccessKeyId = await this.credentialsRepository.getAWSAccessKeyId();
     const awsSecretAccessKey = await this.credentialsRepository.getAWSSecretAccessKey();
@@ -36,15 +34,7 @@ export class S3StorageAdapter {
 
     const s3 = new AWS.S3();
 
-    const managedUpload = s3.upload(params);
-
-    managedUpload.on('httpUploadProgress', (progress) => {
-      if (progressCallback) {
-        progressCallback(progress);
-      }
-    });
-
-    await managedUpload.promise();
+    await s3.upload(params).promise();
   }
 }
 

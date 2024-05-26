@@ -1,14 +1,5 @@
 export interface StorageAdapter {
-  upload(uploadRequest: UploadRequest, options?: UploadRequestOptions): Promise<void>;
-}
-
-export interface UploadRequestOptions {
-  progressCallback?: (progress: Progress) => void;
-}
-
-export interface Progress {
-  loaded: number;
-  total: number;
+  upload(uploadRequest: UploadRequest): Promise<void>;
 }
 
 export interface UploadRequest {

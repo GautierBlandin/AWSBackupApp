@@ -4,10 +4,7 @@ export interface FileSystem {
 }
 
 export type GetInfoResponse = {
-  exists: false;
-} | {
-  exists: true;
-  size: number;
+  exists: boolean;
 };
 
 export type ReadAsStringAsyncOptions = {
