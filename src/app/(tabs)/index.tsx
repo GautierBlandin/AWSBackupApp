@@ -66,9 +66,11 @@ function App() {
           </Progress>
         </View>
       )}
+      {!isUploading && (
       <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
         <Text color="whitesmoke">{isUploading ? 'Uploading...' : 'Upload Images'}</Text>
       </Button>
+      )}
     </View>
   );
 }
