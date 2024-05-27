@@ -1,0 +1,21 @@
+{
+  "name": "di-container",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "di-container/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/di-container",
+        "main": "di-container/src/index.ts",
+        "tsConfig": "di-container/tsconfig.lib.json",
+        "assets": ["di-container/*.md"],
+        "generatePackageJson": true,
+        "format": ["cjs"]
+      }
+    }
+  }
+}
