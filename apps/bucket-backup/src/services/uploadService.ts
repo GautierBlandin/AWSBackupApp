@@ -1,12 +1,11 @@
-import { ImagePickerAsset } from '@/ports/ImagePicker';
+import { ImagePickerAsset } from '../ports/ImagePicker';
 import { toByteArray } from 'base64-js';
-import { DisplayableError } from '@/errors/DisplayableError';
-import { EncodingType } from '@/ports/FileSystem';
-import { inject } from '@ab/di-container';
-import { settingsRepositoryToken } from '@/ports/SettingsRepository.token';
-import { storageAdapterToken } from '@/ports/StorageAdapter.token';
-import { imagePickerToken } from '@/ports/ImagePicker.token';
-import { fileSystemToken } from '@/ports/FileSystem.token';
+import { DisplayableError } from '../errors/DisplayableError';
+import { EncodingType } from '../ports/FileSystem';
+import { inject } from '@bucket-backup/di-container';
+import { settingsRepositoryToken } from '../ports/SettingsRepository.token';
+import { storageAdapterToken } from '../ports/StorageAdapter.token';
+import { fileSystemToken } from '../ports/FileSystem.token';
 import mime from 'mime';
 
 export interface UploadServiceOptions {
@@ -29,8 +28,6 @@ export class UploadService {
 
   private readonly storageAdapter = inject(storageAdapterToken);
 
-  private readonly ImagePicker = inject(imagePickerToken);
-
   private readonly FileSystem = inject(fileSystemToken);
 
   public async uploadUserSelectedAssets(assets: ImagePickerAsset[], options?: UploadServiceOptions) {
@@ -50,7 +47,7 @@ export class UploadService {
           activeSlots += 1;
           const asset = assets[assetToProcessPointer];
           assetToProcessPointer += 1;
-          // eslint-disable-next-line @typescript-eslint/no-loop-func
+          // eslint-disable-next-line @typescript-eslint/no-loop-func, no-loop-func
           this.processAsset(asset).finally(() => {
             processedAssets += 1;
             progressCallback?.(Math.round((processedAssets / assets.length) * 100));

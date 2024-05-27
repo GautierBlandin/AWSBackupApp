@@ -1,0 +1,10 @@
+{
+  "name": "bucket-backup-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/bucket-backup-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["bucket-backup"],
+  "// targets": "to see all targets run: nx show project bucket-backup-e2e --web",
+  "targets": {}
+}
