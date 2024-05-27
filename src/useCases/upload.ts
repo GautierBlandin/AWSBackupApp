@@ -4,6 +4,7 @@ import { DisplayableError } from '@/errors/DisplayableError';
 import { imagePickerToken } from '@/ports/ImagePicker.token';
 import { MediaTypeOptions } from '@/ports/ImagePicker';
 import { UploadService } from '@/services/uploadService';
+import { mediaLibraryToken } from '@/ports/MediaLibraryToken';
 
 export interface UploadUseCaseOutput {
   status: 'success' | 'canceled';
@@ -18,6 +19,8 @@ export interface UploadUseCaseInput {
 
 export class UploadUseCase {
   private readonly credentialsRepository = inject(settingsRepositoryToken);
+
+  private mediaLibrary = inject(mediaLibraryToken);
 
   private readonly ImagePicker = inject(imagePickerToken);
 
@@ -61,7 +64,7 @@ export class UploadUseCase {
   }
 
   private async checkAppPermissions() {
-    const { status } = await this.ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await this.mediaLibrary.getPermissionsAsync();
     if (status !== 'granted') {
       throw new DisplayableError(
         'You need to grant permission to access the media library in order to upload images.',

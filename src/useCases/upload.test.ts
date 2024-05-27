@@ -9,7 +9,10 @@ import { MockFileSystem } from '@/ports/FileSystem.mock';
 import { storageAdapterToken } from '@/ports/StorageAdapter.token';
 import { fileSystemToken } from '@/ports/FileSystem.token';
 import { UploadUseCase } from '@/useCases/upload';
-import { ImagePickerResult, MediaLibraryPermissionResponse, PermissionStatus } from '@/ports/ImagePicker';
+import { ImagePickerResult, PermissionStatus } from '@/ports/ImagePicker';
+import { mockMediaLibraryFactory } from '@/ports/MediaLibrary.mock';
+import { mediaLibraryToken } from '@/ports/MediaLibraryToken';
+import { PermissionResponse } from '@/ports/MediaLibrary';
 
 describe('upload', () => {
   it('should handle upload', async () => {
@@ -112,11 +115,13 @@ const setup = () => {
   const storageAdapter = new MockStorageAdapter();
   const imagePicker = mockImagePickerFactory();
   const fileSystem = new MockFileSystem();
+  const mediaLibrary = mockMediaLibraryFactory();
 
   register(settingsRepositoryToken, { useValue: settingsRepository });
   register(storageAdapterToken, { useValue: storageAdapter });
   register(imagePickerToken, { useValue: imagePicker });
   register(fileSystemToken, { useValue: fileSystem });
+  register(mediaLibraryToken, { useValue: mediaLibrary });
 
   const useCase = new UploadUseCase();
 
@@ -125,8 +130,9 @@ const setup = () => {
   settingsRepository.setAWSSecretAccessKey('secretAccess');
   settingsRepository.setBucketName('bucketName');
 
-  const requestMediaLibraryPermissionResponse: MediaLibraryPermissionResponse = { status: PermissionStatus.GRANTED };
-  imagePicker.requestMediaLibraryPermissionsAsync.mockResolvedValue(requestMediaLibraryPermissionResponse);
+  const requestMediaLibraryPermissionResponse: PermissionResponse = { status: PermissionStatus.GRANTED };
+  mediaLibrary.getPermissionsAsync.mockResolvedValue(requestMediaLibraryPermissionResponse);
+
   const launchImageLibraryResponse: ImagePickerResult = {
     canceled: false,
     assets: [{ uri: 'image1Uri', fileName: 'image1.jpg' }, { uri: 'image2Uri', fileName: 'image2.jpg' }],
