@@ -11,4 +11,8 @@ export class ExpoMediaLibrary implements MediaLibraryInterface {
   getPermissionsAsync(): Promise<ExpoMediaLibraryImport.PermissionResponse> {
     return ExpoMediaLibraryImport.getPermissionsAsync();
   }
+
+  requestPermissionsAsync(): Promise<ExpoMediaLibraryImport.PermissionResponse> {
+    return ExpoMediaLibraryImport.requestPermissionsAsync();
+  }
 }

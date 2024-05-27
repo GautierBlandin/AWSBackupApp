@@ -1,6 +1,7 @@
 export interface MediaLibrary {
   getAssetsAsync(assetsOptions?: AssetsOptions): Promise<PagedInfo<Asset>>;
   getPermissionsAsync(): Promise<PermissionResponse>;
+  requestPermissionsAsync(): Promise<PermissionResponse>;
 }
 
 export type PagedInfo<T> = {
