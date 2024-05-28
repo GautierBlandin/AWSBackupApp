@@ -3,7 +3,7 @@ import { backupDateRepositoryToken } from '../ports/BackupDateRepository.token';
 import { mediaLibraryToken } from '../ports/MediaLibraryToken';
 import { PagedInfo } from 'expo-media-library';
 import { Asset } from '../ports/MediaLibrary';
-import { UploadService, UploadServiceOptions } from '../services/uploadService';
+import { UploadServiceImpl, UploadServiceOptions } from '../services/UploadService';
 
 import * as ExpoMediaLibraryDirect from 'expo-media-library';
 
@@ -12,39 +12,41 @@ export class ScheduledUploadUseCase {
 
   private readonly mediaLibrary = inject(mediaLibraryToken);
 
-  private uploadService = new UploadService();
+  private uploadService = new UploadServiceImpl();
 
   public async backupNewMedia(options: UploadServiceOptions): Promise<void> {
     const startBackupDate = new Date();
 
     const permissions = await ExpoMediaLibraryDirect.requestPermissionsAsync();
 
-    console.log(JSON.stringify(permissions, null, 2));
-
-    try {
-      await this.getAssetsToBackup();
-    } catch (error) {
-      console.log('error', error);
+    if (!permissions.granted) {
+      throw new MissingPermissionsError();
     }
 
     let assets = await this.getAssetsToBackup();
 
-    console.log('assets', assets);
-
     while (assets.hasNextPage) {
       // eslint-disable-next-line no-await-in-loop
-      await this.uploadService.uploadUserSelectedAssets(assets.assets.map((asset) => ({
-        ...asset,
-        fileName: asset.filename,
-      })), options);
+      await this.uploadService.upload(
+        assets.assets.map((asset) => ({
+          ...asset,
+          fileName: asset.filename,
+        })),
+        options
+      );
       // eslint-disable-next-line no-await-in-loop
-      assets = await this.mediaLibrary.getAssetsAsync({ after: assets.endCursor });
+      assets = await this.mediaLibrary.getAssetsAsync({
+        after: assets.endCursor,
+      });
     }
 
-    await this.uploadService.uploadUserSelectedAssets(assets.assets.map((asset) => ({
-      ...asset,
-      fileName: asset.filename,
-    })), options);
+    await this.uploadService.upload(
+      assets.assets.map((asset) => ({
+        ...asset,
+        fileName: asset.filename,
+      })),
+      options
+    );
 
     await this.backupDateRepository.setBackupDate(startBackupDate);
   }
@@ -59,5 +61,11 @@ export class ScheduledUploadUseCase {
     return this.mediaLibrary.getAssetsAsync({
       createdAfter: lastBackupDate.getTime(),
     });
+  }
+}
+
+export class MissingPermissionsError extends Error {
+  constructor() {
+    super('Permission to access media library is required');
   }
 }
