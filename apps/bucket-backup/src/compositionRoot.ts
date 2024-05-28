@@ -11,12 +11,17 @@ import { mediaLibraryToken } from './ports/MediaLibraryToken';
 import { ExpoMediaLibrary } from './infrastructure/ExpoMediaLibrary';
 import { backupDateRepositoryToken } from './ports/BackupDateRepository.token';
 import { AsyncStorageBackupDateRepository } from './infrastructure/AsyncStorageBackupDateRepository';
+import { UploadServiceImpl, uploadServiceToken } from './services/UploadService';
 
 export function registerApp() {
+  // Register Infrastructure
   register(fileSystemToken, { useClass: ExpoFileSystem });
   register(storageAdapterToken, { useClass: S3StorageAdapter });
   register(imagePickerToken, { useClass: ExpoImagePicker });
   register(settingsRepositoryToken, { useClass: AsyncStorageSettingsRepository });
   register(mediaLibraryToken, { useClass: ExpoMediaLibrary });
   register(backupDateRepositoryToken, { useClass: AsyncStorageBackupDateRepository });
+
+  // Register Services
+  register(uploadServiceToken, { useClass: UploadServiceImpl });
 }
