@@ -1,5 +1,5 @@
-export const uploadServiceFactory = () => {
+export const mockUploadServiceFactory = () => {
   return {
-    upload: jest.fn(),
+    upload: jest.fn<Promise<void>, []>(),
   };
 };

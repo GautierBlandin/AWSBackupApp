@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import {
-  Button, Text, YStack,
-} from 'tamagui';
+import { Button, Text, YStack } from 'tamagui';
 import { useNavigation } from 'expo-router';
 import { UploadUseCase } from '../../useCases/upload';
 import { DisplayableError } from '../../errors/DisplayableError';
 import crossPlatformAlert from '../../components/CrossPlatformAlert';
 import UploadProgressBar from '../../components/UploadProgressBar';
-import { ScheduledUploadUseCase } from '../../useCases/scheduledUpload';
+import { FullUploadUseCase } from '../../useCases/fullUpload';
 import { AppPermissionsUseCase } from '../../useCases/appPermissions';
 
 function App() {
@@ -18,7 +16,7 @@ function App() {
 
   const uploadUseCase = useMemo(() => new UploadUseCase(), []);
 
-  const scheduledUploadUseCase = useMemo(() => new ScheduledUploadUseCase(), []);
+  const scheduledUploadUseCase = useMemo(() => new FullUploadUseCase(), []);
 
   const permissionUseCase = useMemo(() => new AppPermissionsUseCase(), []);
 
@@ -44,17 +42,12 @@ function App() {
           'Upload Successful',
           'The selected images have been uploaded successfully.',
           [{ text: 'OK' }],
-          { cancelable: false },
+          { cancelable: false }
         );
       }
     } catch (error) {
       if (error instanceof DisplayableError) {
-        crossPlatformAlert(
-          error.title,
-          error.message,
-          [{ text: 'OK' }],
-          { cancelable: false },
-        );
+        crossPlatformAlert(error.title, error.message, [{ text: 'OK' }], { cancelable: false });
       }
     } finally {
       setIsUploading(false);
@@ -78,16 +71,11 @@ function App() {
         'Upload Successful',
         'The selected images have been uploaded successfully.',
         [{ text: 'OK' }],
-        { cancelable: false },
+        { cancelable: false }
       );
     } catch (error) {
       if (error instanceof DisplayableError) {
-        crossPlatformAlert(
-          error.title,
-          error.message,
-          [{ text: 'OK' }],
-          { cancelable: false },
-        );
+        crossPlatformAlert(error.title, error.message, [{ text: 'OK' }], { cancelable: false });
       }
     } finally {
       setIsUploading(false);
@@ -104,14 +92,14 @@ function App() {
       {isUploading && <UploadProgressBar uploadProgress={uploadProgress} />}
       <YStack gap={20}>
         {!isUploading && (
-        <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
-          <Text color="whitesmoke">{isUploading ? 'Uploading...' : 'Upload Images'}</Text>
-        </Button>
+          <Button backgroundColor="blue" onPress={handleUpload} disabled={isUploading}>
+            <Text color="whitesmoke">{isUploading ? 'Uploading...' : 'Upload Images'}</Text>
+          </Button>
         )}
         {!isUploading && (
-        <Button backgroundColor="blue" onPress={handleScheduledUpload} disabled={isUploading}>
-          <Text color="whitesmoke">Upload All New Images</Text>
-        </Button>
+          <Button backgroundColor="blue" onPress={handleScheduledUpload} disabled={isUploading}>
+            <Text color="whitesmoke">Upload All New Images</Text>
+          </Button>
         )}
       </YStack>
     </View>

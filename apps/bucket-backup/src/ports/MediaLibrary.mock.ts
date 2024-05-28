@@ -1,5 +1,9 @@
+import { Asset, AssetsOptions, PagedInfo, PermissionResponse, PermissionStatus } from './MediaLibrary';
+
 export const mockMediaLibraryFactory = () => ({
-  getAssetsAsync: jest.fn(),
-  getPermissionsAsync: jest.fn(),
-  requestPermissionsAsync: jest.fn(),
+  getAssetsAsync: jest.fn<Promise<PagedInfo<Asset>>, [AssetsOptions | undefined]>(),
+  getPermissionsAsync: jest.fn().mockResolvedValue({ status: PermissionStatus.GRANTED } satisfies PermissionResponse),
+  requestPermissionsAsync: jest
+    .fn()
+    .mockResolvedValue({ status: PermissionStatus.GRANTED } satisfies PermissionResponse),
 });

@@ -2,64 +2,68 @@ import { inject } from '@bucket-backup/di-container';
 import { backupDateRepositoryToken } from '../ports/BackupDateRepository.token';
 import { mediaLibraryToken } from '../ports/MediaLibraryToken';
 import { PagedInfo } from 'expo-media-library';
-import { Asset } from '../ports/MediaLibrary';
-import { UploadServiceImpl, UploadServiceOptions } from '../services/UploadService';
+import { Asset, PermissionStatus } from '../ports/MediaLibrary';
+import { UploadServiceOptions, uploadServiceToken } from '../services/UploadService';
+import { dateServiceToken } from '../services/DateService';
 
-import * as ExpoMediaLibraryDirect from 'expo-media-library';
-
-export class ScheduledUploadUseCase {
+export class FullUploadUseCase {
   private readonly backupDateRepository = inject(backupDateRepositoryToken);
 
   private readonly mediaLibrary = inject(mediaLibraryToken);
 
-  private uploadService = new UploadServiceImpl();
+  private uploadService = inject(uploadServiceToken);
+
+  private dateService = inject(dateServiceToken);
 
   public async backupNewMedia(options: UploadServiceOptions): Promise<void> {
-    const startBackupDate = new Date();
+    const startBackupDate = this.dateService.now();
 
-    const permissions = await ExpoMediaLibraryDirect.requestPermissionsAsync();
+    const permissions = await this.mediaLibrary.requestPermissionsAsync();
 
-    if (!permissions.granted) {
+    if (!(permissions.status === PermissionStatus.GRANTED)) {
       throw new MissingPermissionsError();
     }
 
+    options.onUploadStart?.();
+
+    const assetsArray: Asset[] = [];
     let assets = await this.getAssetsToBackup();
 
     while (assets.hasNextPage) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.uploadService.upload(
-        assets.assets.map((asset) => ({
-          ...asset,
-          fileName: asset.filename,
-        })),
-        options
-      );
-      // eslint-disable-next-line no-await-in-loop
-      assets = await this.mediaLibrary.getAssetsAsync({
+      assetsArray.push(...assets.assets);
+      assets = await this.getAssetsToBackup({
         after: assets.endCursor,
       });
     }
 
+    assetsArray.push(...assets.assets);
+
     await this.uploadService.upload(
-      assets.assets.map((asset) => ({
-        ...asset,
+      assetsArray.map((asset) => ({
+        uri: asset.uri,
         fileName: asset.filename,
       })),
-      options
+      {
+        onUploadEnd: options.onUploadEnd,
+        progressCallback: options.progressCallback,
+      }
     );
 
     await this.backupDateRepository.setBackupDate(startBackupDate);
   }
 
-  private async getAssetsToBackup(): Promise<PagedInfo<Asset>> {
+  private async getAssetsToBackup(args?: { after?: string }): Promise<PagedInfo<Asset>> {
     const lastBackupDate = await this.backupDateRepository.getBackupDate();
 
     if (!lastBackupDate) {
-      return this.mediaLibrary.getAssetsAsync();
+      return this.mediaLibrary.getAssetsAsync({
+        after: args?.after,
+      });
     }
 
     return this.mediaLibrary.getAssetsAsync({
       createdAfter: lastBackupDate.getTime(),
+      after: args?.after,
     });
   }
 }

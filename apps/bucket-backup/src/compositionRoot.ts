@@ -12,6 +12,7 @@ import { ExpoMediaLibrary } from './infrastructure/ExpoMediaLibrary';
 import { backupDateRepositoryToken } from './ports/BackupDateRepository.token';
 import { AsyncStorageBackupDateRepository } from './infrastructure/AsyncStorageBackupDateRepository';
 import { UploadServiceImpl, uploadServiceToken } from './services/UploadService';
+import { DateServiceImpl, dateServiceToken } from './services/DateService';
 
 export function registerApp() {
   // Register Infrastructure
@@ -24,4 +25,5 @@ export function registerApp() {
 
   // Register Services
   register(uploadServiceToken, { useClass: UploadServiceImpl });
+  register(dateServiceToken, { useClass: DateServiceImpl });
 }
