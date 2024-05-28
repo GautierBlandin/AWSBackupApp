@@ -13,6 +13,7 @@ import { ImagePickerResult, PermissionStatus } from '../ports/ImagePicker';
 import { mockMediaLibraryFactory } from '../ports/MediaLibrary.mock';
 import { mediaLibraryToken } from '../ports/MediaLibraryToken';
 import { PermissionResponse } from '../ports/MediaLibrary';
+import { UploadServiceImpl, uploadServiceToken } from '../services/UploadService';
 
 describe('upload', () => {
   it('should handle upload', async () => {
@@ -73,7 +74,10 @@ describe('upload', () => {
 
     const launchImageLibraryResponse: ImagePickerResult = {
       canceled: false,
-      assets: [{ uri: 'image1Uri', fileName: undefined }, { uri: 'image2Uri', fileName: 'image2.jpg' }],
+      assets: [
+        { uri: 'image1Uri', fileName: undefined },
+        { uri: 'image2Uri', fileName: 'image2.jpg' },
+      ],
     };
     imagePicker.launchImageLibraryAsync.mockResolvedValue(launchImageLibraryResponse);
 
@@ -122,6 +126,7 @@ const setup = () => {
   register(imagePickerToken, { useValue: imagePicker });
   register(fileSystemToken, { useValue: fileSystem });
   register(mediaLibraryToken, { useValue: mediaLibrary });
+  register(uploadServiceToken, { useClass: UploadServiceImpl });
 
   const useCase = new UploadUseCase();
 
@@ -135,14 +140,17 @@ const setup = () => {
 
   const launchImageLibraryResponse: ImagePickerResult = {
     canceled: false,
-    assets: [{ uri: 'image1Uri', fileName: 'image1.jpg' }, { uri: 'image2Uri', fileName: 'image2.jpg' }],
+    assets: [
+      { uri: 'image1Uri', fileName: 'image1.jpg' },
+      { uri: 'image2Uri', fileName: 'image2.jpg' },
+    ],
   };
   imagePicker.launchImageLibraryAsync.mockResolvedValue(launchImageLibraryResponse);
 
-  fileSystem.setFiles(
-    [{ uri: 'image1Uri', content: 'image1Content' },
-      { uri: 'image2Uri', content: 'image2Content' }],
-  );
+  fileSystem.setFiles([
+    { uri: 'image1Uri', content: 'image1Content' },
+    { uri: 'image2Uri', content: 'image2Content' },
+  ]);
 
   return {
     settingsRepository,

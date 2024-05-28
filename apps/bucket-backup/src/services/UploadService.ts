@@ -2,7 +2,7 @@ import { ImagePickerAsset } from '../ports/ImagePicker';
 import { toByteArray } from 'base64-js';
 import { DisplayableError } from '../errors/DisplayableError';
 import { EncodingType } from '../ports/FileSystem';
-import { inject } from '@bucket-backup/di-container';
+import { createInjectionToken, inject } from '@bucket-backup/di-container';
 import { settingsRepositoryToken } from '../ports/SettingsRepository.token';
 import { storageAdapterToken } from '../ports/StorageAdapter.token';
 import { fileSystemToken } from '../ports/FileSystem.token';
@@ -23,14 +23,20 @@ export interface AssetWithContent {
   fileContent: string;
 }
 
-export class UploadService {
+export interface UploadService {
+  upload(assets: ImagePickerAsset[], options?: UploadServiceOptions): Promise<void>;
+}
+
+export const uploadServiceToken = createInjectionToken<UploadService>('UploadService');
+
+export class UploadServiceImpl implements UploadService {
   private readonly credentialsRepository = inject(settingsRepositoryToken);
 
   private readonly storageAdapter = inject(storageAdapterToken);
 
   private readonly FileSystem = inject(fileSystemToken);
 
-  public async uploadUserSelectedAssets(assets: ImagePickerAsset[], options?: UploadServiceOptions) {
+  public async upload(assets: ImagePickerAsset[], options?: UploadServiceOptions) {
     const { progressCallback, onUploadStart, onUploadEnd } = options || {};
 
     onUploadStart?.();
@@ -55,7 +61,9 @@ export class UploadService {
           });
         } else {
           // eslint-disable-next-line no-await-in-loop
-          await new Promise((resolve) => { setTimeout(resolve, 100); });
+          await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+          });
         }
       }
     };

@@ -3,7 +3,7 @@ import { settingsRepositoryToken } from '../ports/SettingsRepository.token';
 import { DisplayableError } from '../errors/DisplayableError';
 import { imagePickerToken } from '../ports/ImagePicker.token';
 import { MediaTypeOptions } from '../ports/ImagePicker';
-import { UploadService } from '../services/uploadService';
+import { uploadServiceToken } from '../services/UploadService';
 import { mediaLibraryToken } from '../ports/MediaLibraryToken';
 
 export interface UploadUseCaseOutput {
@@ -24,7 +24,7 @@ export class UploadUseCase {
 
   private readonly ImagePicker = inject(imagePickerToken);
 
-  private uploadService = new UploadService();
+  private uploadService = inject(uploadServiceToken);
 
   public async handleUpload(input?: UploadUseCaseInput): Promise<UploadUseCaseOutput> {
     await this.checkCredentials();
@@ -40,7 +40,7 @@ export class UploadUseCase {
     }
 
     try {
-      await this.uploadService.uploadUserSelectedAssets(userSelectedAssetsResult.assets, input);
+      await this.uploadService.upload(userSelectedAssetsResult.assets, input);
     } catch (error) {
       throw new DisplayableError('An error occurred while uploading the images.', 'Upload Error');
     }
@@ -68,7 +68,7 @@ export class UploadUseCase {
     if (status !== 'granted') {
       throw new DisplayableError(
         'You need to grant permission to access the media library in order to upload images.',
-        'Permission Denied',
+        'Permission Denied'
       );
     }
   }
