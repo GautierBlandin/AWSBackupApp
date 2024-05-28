@@ -12,19 +12,11 @@ import { ExpoMediaLibrary } from './infrastructure/ExpoMediaLibrary';
 import { backupDateRepositoryToken } from './ports/BackupDateRepository.token';
 import { AsyncStorageBackupDateRepository } from './infrastructure/AsyncStorageBackupDateRepository';
 
-const infrastructureRegistered = {
-  loaded: false,
-};
-
-export function registerInfrastructure() {
-  if (!infrastructureRegistered.loaded) {
-    register(fileSystemToken, { useClass: ExpoFileSystem });
-    register(storageAdapterToken, { useClass: S3StorageAdapter });
-    register(imagePickerToken, { useClass: ExpoImagePicker });
-    register(settingsRepositoryToken, { useClass: AsyncStorageSettingsRepository });
-    register(mediaLibraryToken, { useClass: ExpoMediaLibrary });
-    register(backupDateRepositoryToken, { useClass: AsyncStorageBackupDateRepository });
-  }
-
-  infrastructureRegistered.loaded = true;
+export function registerApp() {
+  register(fileSystemToken, { useClass: ExpoFileSystem });
+  register(storageAdapterToken, { useClass: S3StorageAdapter });
+  register(imagePickerToken, { useClass: ExpoImagePicker });
+  register(settingsRepositoryToken, { useClass: AsyncStorageSettingsRepository });
+  register(mediaLibraryToken, { useClass: ExpoMediaLibrary });
+  register(backupDateRepositoryToken, { useClass: AsyncStorageBackupDateRepository });
 }
